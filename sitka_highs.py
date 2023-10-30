@@ -1,24 +1,36 @@
 from pathlib import Path
 import csv
 import matplotlib.pyplot as plt
+from datetime import datetime
 
 # Giving path and splitting the lines read from the file.
-path = Path('weather_data\sitka_weather_07-2021_simple.csv')
+path = Path('weather_data\sitka_weather_2021_simple.csv')
 lines = path.read_text().splitlines()
 # Read the csv file format and store all the elements seperated by the de-limiter ','
 reader = csv.reader(lines)
 header_row = next(reader)
-# Extracting the temperature high values present in the csv.
-highs = [int(row[4]) for row in reader]
-
+# Extracting the high temperature, low temperature and dates values present in the csv.
+dates, highs, lows = [], [], []
+for row in reader:
+    high = int(row[4])
+    current_date = datetime.strptime(row[2], '%Y-%m-%d')
+    low = int(row[5])
+    
+    dates.append(current_date)
+    highs.append(high)
+    lows.append(low)
 # Drawing the graph on the matplotlib viewer
 plt.style.use('grayscale')
 fig, ax = plt.subplots()
-ax.plot(highs, color = 'red')
+ax.plot(dates, highs, color = 'red', alpha = 0.5)
+ax.plot(dates, lows, color = 'blue', alpha = 0.5)
+ax.fill_between(dates, highs, lows, color = 'blue', alpha = 0.1)
 
 # Setting the title and axes labels.
-ax.set_title("Daily High Temperatures", fontsize = 24)
+ax.set_title("Daily High Temperatures, 2021", fontsize = 24)
 ax.set_xlabel("", fontsize = 14)
+fig.autofmt_xdate()
 ax.set_ylabel("Temperature (F)", fontsize = 16)
+
 
 plt.show()
